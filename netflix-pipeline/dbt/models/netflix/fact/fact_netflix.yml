@@ -1,0 +1,70 @@
+version: 2
+
+models:
+  - name: POPULARITY_FACT
+    description: >
+      One row per Netflix title. Joins show details with IMDB/TMDB scores.
+      Incrementally updated — only modified rows are merged on each run.
+    columns:
+      - name: ID
+        tests:
+          - unique
+          - not_null
+      - name: TITLE
+        tests: [not_null]
+      - name: TYPE
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["MOVIE", "SHOW"]
+      - name: IMDB_SCORE
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 10
+              inclusive: true
+      - name: TMDB_SCORE
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 10
+              inclusive: true
+
+  - name: ACTORS_DOMINATING_FACT
+    description: >
+      Actor performance counts per genre. One row per actor-genre combination.
+    columns:
+      - name: GENRE
+        tests: [not_null]
+      - name: ACTOR_NAME
+        tests: [not_null]
+      - name: TOTAL_PERFORMANCES
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1
+              inclusive: true
+
+  - name: CONTENT_TYPE_SHARE_FACT
+    description: >
+      Movie vs show percentage share per genre. One row per genre.
+    columns:
+      - name: GENRE
+        tests:
+          - unique
+          - not_null
+      - name: MOVIE_PCT
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      - name: SHOW_PCT
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      - name: TOTAL_CONTENT
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1

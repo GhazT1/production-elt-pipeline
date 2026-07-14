@@ -1,0 +1,30 @@
+# Secrets — never commit these
+.env
+*.env
+profiles.yml
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# dbt build artefacts — generated, not source-of-truth
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db

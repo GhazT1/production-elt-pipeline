@@ -1,0 +1,50 @@
+name: 'netflix_project'
+version: '1.0.0'
+config-version: 2
+
+profile: 'netflix'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# ---------------------------------------------------------------------------
+# Model configuration
+# ---------------------------------------------------------------------------
+models:
+  netflix_project:
+    netflix:
+      stage:
+        +materialized: table
+        +schema: DBT_STAGE
+        +tags: ["STAGE"]
+        +post_hook: "GRANT SELECT ON TABLE {{ this }} TO ROLE {{ env_var('DBT_READER_ROLE') }}"
+
+      dimension:
+        +materialized: table
+        +schema: DBT_TRANSFORM
+        +tags: ["DIMENSION"]
+        +post_hook: "GRANT SELECT ON TABLE {{ this }} TO ROLE {{ env_var('DBT_READER_ROLE') }}"
+
+      fact:
+        +materialized: incremental
+        +schema: DBT_TRANSFORM
+        +tags: ["FACT"]
+        +incremental_strategy: merge
+        +post_hook: "GRANT SELECT ON TABLE {{ this }} TO ROLE {{ env_var('DBT_READER_ROLE') }}"
+
+# ---------------------------------------------------------------------------
+# dbt variables — override per target in profiles.yml
+# ---------------------------------------------------------------------------
+vars:
+  raw_database: "{{ env_var('SF_DATABASE') }}"
+  raw_schema: "DBT_RAW"
+  reader_role: "{{ env_var('DBT_READER_ROLE') }}"

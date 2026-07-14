@@ -1,0 +1,58 @@
+name: Pipeline CI
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── 1. Python linting & unit tests ────────────────────────────────────────
+  python-checks:
+    name: Python lint + tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install ruff pytest boto3 snowflake-connector-python pandas apache-airflow
+
+      - name: Lint with ruff
+        run: ruff check airflow/
+
+      - name: Run unit tests
+        run: pytest tests/ -v
+
+  # ── 2. dbt model compilation check (no Snowflake needed) ──────────────────
+  dbt-compile:
+    name: dbt compile check
+    runs-on: ubuntu-latest
+    env:
+      SF_ACCOUNT: ci-placeholder
+      SF_USER: ci
+      SF_PASSWORD: ci
+      SF_DATABASE: CI_DB
+      DBT_READER_ROLE: CI_ROLE
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dbt
+        run: pip install dbt-snowflake
+
+      - name: dbt compile (syntax check only)
+        working-directory: dbt
+        run: |
+          cp profiles.yml.template ~/.dbt/profiles.yml
+          dbt compile --target dev --profiles-dir ~/.dbt

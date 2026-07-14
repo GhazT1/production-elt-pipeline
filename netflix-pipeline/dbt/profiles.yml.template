@@ -1,0 +1,49 @@
+# dbt profiles.yml — TEMPLATE
+# ============================================================
+# Copy this to ~/.dbt/profiles.yml and fill in your values,
+# OR let the pipeline inject them via environment variables.
+#
+# NEVER commit real credentials. All sensitive values use
+# env_var() so secrets stay in AWS SSM / CI secrets manager.
+# ============================================================
+
+netflix:
+  target: dev
+
+  outputs:
+    dev:
+      type: snowflake
+      account: "{{ env_var('SF_ACCOUNT') }}"
+      user: "{{ env_var('SF_USER') }}"
+      password: "{{ env_var('SF_PASSWORD') }}"
+      role: "{{ env_var('SF_ROLE', 'TRANSFORMER') }}"
+      warehouse: "{{ env_var('SF_WAREHOUSE', 'COMPUTE_WH') }}"
+      database: "{{ env_var('SF_DATABASE') }}"
+      schema: DBT_TRANSFORM
+      threads: 4
+      client_session_keep_alive: false
+      query_tag: "dbt-dev"
+
+    staging:
+      type: snowflake
+      account: "{{ env_var('SF_ACCOUNT') }}"
+      user: "{{ env_var('SF_USER') }}"
+      password: "{{ env_var('SF_PASSWORD') }}"
+      role: "{{ env_var('SF_ROLE', 'TRANSFORMER') }}"
+      warehouse: "{{ env_var('SF_WAREHOUSE', 'COMPUTE_WH') }}"
+      database: "{{ env_var('SF_DATABASE') }}"
+      schema: DBT_TRANSFORM
+      threads: 4
+      query_tag: "dbt-staging"
+
+    prod:
+      type: snowflake
+      account: "{{ env_var('SF_ACCOUNT') }}"
+      user: "{{ env_var('SF_USER') }}"
+      password: "{{ env_var('SF_PASSWORD') }}"
+      role: "{{ env_var('SF_ROLE', 'TRANSFORMER') }}"
+      warehouse: "{{ env_var('SF_WAREHOUSE', 'COMPUTE_WH') }}"
+      database: "{{ env_var('SF_DATABASE') }}"
+      schema: DBT_TRANSFORM
+      threads: 8
+      query_tag: "dbt-prod"

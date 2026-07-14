@@ -1,0 +1,44 @@
+version: 2
+
+models:
+  - name: SHOW_DETAILS_STAGE
+    description: Cleaned show/movie metadata. One row per Netflix title.
+    columns:
+      - name: ID
+        tests:
+          - unique
+          - not_null
+      - name: TYPE
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["MOVIE", "SHOW"]
+      - name: RELEASE_YEAR
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1900
+              max_value: 2030
+      - name: TITLE
+        tests: [not_null]
+
+  - name: CREDITS_STAGE
+    description: Deduplicated actor/director credits. One row per person per title.
+    columns:
+      - name: ID
+        tests: [not_null]
+      - name: NAME
+        tests: [not_null]
+      - name: ROLE
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["ACTOR", "DIRECTOR"]
+
+  - name: SCORES_VOTES_STAGE
+    description: IMDB and TMDB scores. One row per title (NULLs retained).
+    columns:
+      - name: ID
+        tests:
+          - unique
+          - not_null
