@@ -12,7 +12,6 @@ import logging
 import os
 
 from airflow import DAG
-from airflow.hooks.base import BaseHook
 from airflow.providers.slack.operators.slack_webhook import SlackWebhookOperator
 
 logger = logging.getLogger(__name__)
@@ -49,25 +48,18 @@ def build_failure_alert(context: dict) -> SlackWebhookOperator:
     """
     ti = context["task_instance"]
 
-    try:
-        slack_token = BaseHook.get_connection(SLACK_CONN_ID).password
-    except Exception as exc:
-        logger.error("Could not retrieve Slack connection '%s': %s", SLACK_CONN_ID, exc)
-        raise
-
     message = (
         f":red_circle: *Pipeline Failure* {_env_emoji()}\n"
         f">*DAG:* `{ti.dag_id}`\n"
         f">*Task:* `{ti.task_id}`\n"
         f">*Env:* `{ENV}`\n"
-        f">*Run:* `{context['execution_date'].isoformat()}`\n"
+        f">*Run:* `{context['logical_date'].isoformat()}`\n"
         f">*Log:* <{ti.log_url}|View logs>"
     )
 
     return SlackWebhookOperator(
         task_id="slack_failure_alert",
-        http_conn_id=SLACK_CONN_ID,
-        webhook_token=slack_token,
+        slack_webhook_conn_id=SLACK_CONN_ID,
         message=message,
         on_failure_callback=None,   # prevent recursive alerts
     )
@@ -89,12 +81,6 @@ def build_success_alert(dag: DAG) -> SlackWebhookOperator:
     Returns:
         SlackWebhookOperator as a DAG task node.
     """
-    try:
-        slack_token = BaseHook.get_connection(SLACK_CONN_ID).password
-    except Exception as exc:
-        logger.error("Could not retrieve Slack connection '%s': %s", SLACK_CONN_ID, exc)
-        raise
-
     message = (
         ":large_green_circle: *Pipeline Success*\n"
         ">*DAG:* `{{ task_instance.dag_id }}`\n"
@@ -105,8 +91,7 @@ def build_success_alert(dag: DAG) -> SlackWebhookOperator:
 
     return SlackWebhookOperator(
         task_id="slack_success_alert",
-        http_conn_id=SLACK_CONN_ID,
-        webhook_token=slack_token,
+        slack_webhook_conn_id=SLACK_CONN_ID,
         message=message,
         on_failure_callback=None,
         dag=dag,
