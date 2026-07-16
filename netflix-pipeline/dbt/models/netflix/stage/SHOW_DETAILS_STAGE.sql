@@ -25,12 +25,12 @@ SELECT
     -- Strip Python list brackets: ['Action', 'Drama'] → 'ACTION, DRAMA'
     ,UPPER(
         TRIM(
-            REGEXP_REPLACE(GENRES, '[\\[\\]\\'"]', '')
+            REGEXP_REPLACE(GENRES, '[\\[\\]''"]', '')
         )
     )                                                           AS GENRES
     ,UPPER(
         TRIM(
-            REGEXP_REPLACE(PRODUCTION_COUNTRIES, '[\\[\\]\\'"]', '')
+            REGEXP_REPLACE(PRODUCTION_COUNTRIES, '[\\[\\]''"]', '')
         )
     )                                                           AS PRODUCTION_COUNTRIES
     ,SEASONS::INTEGER                                           AS SEASONS

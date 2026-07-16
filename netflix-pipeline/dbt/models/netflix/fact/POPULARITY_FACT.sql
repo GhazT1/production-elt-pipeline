@@ -24,7 +24,7 @@ WITH scores AS (
         ,IMDB_VOTES
         ,TMDB_POPULARITY
         ,TMDB_SCORE
-    FROM {{ ref('SCORES_VOTES_STAGE') }}
+    FROM {{ ref('scores_votes_stage') }}
 )
 
 SELECT
@@ -43,12 +43,12 @@ SELECT
     ,s.TMDB_SCORE
     ,CURRENT_TIMESTAMP()    AS _UPDATED_AT
 
-FROM {{ ref('SHOW_DETAILS_STAGE') }} AS d
+FROM {{ ref('show_details_stage') }} AS d
 LEFT JOIN scores AS s ON d.ID = s.ID
 
 {% if is_incremental() %}
 WHERE d.ID IN (
-    SELECT ID FROM {{ ref('SHOW_DETAILS_STAGE') }}
+    SELECT ID FROM {{ ref('show_details_stage') }}
     WHERE _LOADED_AT > (SELECT MAX(_UPDATED_AT) FROM {{ this }})
 )
 {% endif %}

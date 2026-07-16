@@ -21,7 +21,7 @@
 
 WITH actors AS (
     SELECT ID, NAME AS ACTOR_NAME
-    FROM {{ ref('CREDITS_STAGE') }}
+    FROM {{ ref('credits_stage') }}
     WHERE ROLE = 'ACTOR'
 ),
 
@@ -29,7 +29,7 @@ show_genres AS (
     SELECT
         sd.ID
         ,TRIM(g.VALUE::STRING) AS GENRE
-    FROM {{ ref('SHOW_DETAILS_STAGE') }} AS sd
+    FROM {{ ref('show_details_stage') }} AS sd
     -- Split comma-separated genres into individual rows
     ,LATERAL SPLIT_TO_TABLE(sd.GENRES, ',') AS g
     WHERE sd.GENRES IS NOT NULL

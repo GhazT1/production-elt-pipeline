@@ -20,7 +20,7 @@ WITH exploded AS (
     SELECT
         TRIM(g.VALUE::STRING)  AS GENRE
         ,TYPE
-    FROM {{ ref('SHOW_DETAILS_STAGE') }}
+    FROM {{ ref('show_details_stage') }}
     ,LATERAL SPLIT_TO_TABLE(GENRES, ',') AS g
     WHERE GENRES IS NOT NULL
       AND TYPE IS NOT NULL
@@ -50,7 +50,7 @@ FROM aggregated
 {% if is_incremental() %}
 WHERE GENRE IN (
     SELECT DISTINCT TRIM(g.VALUE::STRING)
-    FROM {{ ref('SHOW_DETAILS_STAGE') }}
+    FROM {{ ref('show_details_stage') }}
     ,LATERAL SPLIT_TO_TABLE(GENRES, ',') AS g
     WHERE _LOADED_AT > (SELECT MAX(_UPDATED_AT) FROM {{ this }})
 )

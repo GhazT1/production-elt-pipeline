@@ -9,7 +9,7 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth'
-    _PIP_ADDITIONAL_REQUIREMENTS: 'dbt-snowflake==1.8.0 snowflake-connector-python boto3'
+    _PIP_ADDITIONAL_REQUIREMENTS: 'dbt-core==1.8.8 dbt-snowflake==1.8.3 snowflake-connector-python boto3'
     # Pipeline env vars (loaded from .env)
     PIPELINE_ENV: ${PIPELINE_ENV}
     AWS_REGION: ${AWS_REGION}

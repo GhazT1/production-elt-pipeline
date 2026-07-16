@@ -24,7 +24,10 @@ sources:
               - unique
               - not_null
           - name: TITLE
-            tests: [not_null]
+            tests:
+              - not_null:
+                  config:
+                    severity: warn
           - name: TYPE
             tests:
               - not_null

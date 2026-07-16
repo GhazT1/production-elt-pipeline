@@ -26,25 +26,24 @@ models:
         +materialized: table
         +schema: DBT_STAGE
         +tags: ["STAGE"]
-        +post_hook: "GRANT SELECT ON TABLE {{ this }} TO ROLE {{ env_var('DBT_READER_ROLE') }}"
+        +post_hook: "GRANT SELECT ON TABLE {{ this }} TO ROLE {{ env_var('DBT_READER_ROLE', 'PUBLIC') }}"
 
       dimension:
         +materialized: table
         +schema: DBT_TRANSFORM
         +tags: ["DIMENSION"]
-        +post_hook: "GRANT SELECT ON TABLE {{ this }} TO ROLE {{ env_var('DBT_READER_ROLE') }}"
+        +post_hook: "GRANT SELECT ON TABLE {{ this }} TO ROLE {{ env_var('DBT_READER_ROLE', 'PUBLIC') }}"
 
       fact:
         +materialized: incremental
         +schema: DBT_TRANSFORM
         +tags: ["FACT"]
         +incremental_strategy: merge
-        +post_hook: "GRANT SELECT ON TABLE {{ this }} TO ROLE {{ env_var('DBT_READER_ROLE') }}"
+        +post_hook: "GRANT SELECT ON TABLE {{ this }} TO ROLE {{ env_var('DBT_READER_ROLE', 'PUBLIC') }}"
 
 # ---------------------------------------------------------------------------
 # dbt variables — override per target in profiles.yml
 # ---------------------------------------------------------------------------
 vars:
-  raw_database: "{{ env_var('SF_DATABASE') }}"
+  raw_database: "PROD"
   raw_schema: "DBT_RAW"
-  reader_role: "{{ env_var('DBT_READER_ROLE') }}"
